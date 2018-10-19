@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { SelectFriendPage } from '../select-friend/select-friend';
 import { StoryControllerProvider } from '../../providers/story-controller/story-controller';
+import { TabsPage } from '../tabs/tabs';
 
 @Component({
   selector: 'page-home',
@@ -22,6 +23,10 @@ export class HomePage {
 
   chooseFriends(storyId: any) {
     this.navCtrl.push(SelectFriendPage, {storyId: storyId});
+  }
+
+  goToProfile() {
+    this.navCtrl.setRoot(ProfilePage);
   }
 
 }
