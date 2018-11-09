@@ -3,17 +3,17 @@
 
 // Home page functions
 function getEditorPicks() {
-  // TODO: Make it work with DB
-  return [
-    [
-      'title' => 'Intern breaks government',
-      'excerpt' => "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ullam, ab quibusdam architecto dolorum voluptatem qui tempore optio doloremque, nisi itaque, consectetur dicta minus! Excepturi earum, suscipit molestiae nam assumenda beatae explicabo, vitae dicta distinctio hic minus autem architecto tenetur culpa consequatur odio ex error debitis cupiditate modi aut laudantium eius."
-    ], // story 1
-    [
-      'title' => 'Tsunami and me',
-      'excerpt' => "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut alias quas animi libero asperiores illo, recusandae dicta doloremque distinctio officia molestias adipisci ex, quam repellat. Odit eligendi eos perspiciatis iste, repellendus ad magnam optio magni et amet, ex atque. Blanditiis cupiditate cumque quaerat consequuntur explicabo dolores deleniti, at quis ratione?"
-    ] // story 2
-  ];
+  $connection = getConnection();
+
+  $rawResult = $connection->query("SELECT * FROM editor_picks");
+
+  $items = [];
+
+  while ($row = $rawResult->fetch_assoc()) {
+    $items[] = $row;
+  }
+
+  return $items;
 }
 
 
@@ -39,24 +39,107 @@ function getMyStories() {
   ];
 }
 
-function getStory() {
+function getStory($id) {
+  $stories = runSafeQuery(
+    "SELECT * FROM stories WHERE id = ?",
+    ['i', $id]
+  );
+  $story = reset($stories);
+
+  $chapters = runSafeQuery(
+    "SELECT * FROM chapters WHERE story_id = ?",
+    ["i", $id]
+  );
+
   return [
-    'title' => 'Some title once told me',
-    'chapters' => [
-      ['text' => 'All the paragraph text goes here'],
-      ['text' => 'All the paragraph text goes here'],
-      ['text' => 'All the paragraph text goes here'],
-      ['text' => 'All the paragraph text goes here'],
-      ['text' => 'All the paragraph text goes here'],
-      ['text' => 'All the paragraph text goes here'],
-    ]
+    'title' => $story['title'],
+    'chapters' => $chapters
   ];
 }
 
+function getConnection() {
+  $connection = new mysqli('localhost:8889', 'root', 'root', 'tnes');
 
+  if ($connection->error) {
+    die("Creating connection failed:" . $connection->error);
+  }
 
+  return $connection;
+}
 
+function simpleGet($sqlQuery) {
+  $connection = getConnection();
 
+  $result = $connection->query($sqlQuery);
+
+  $items = [];
+
+  while ($row = $result->fetch_assoc()) {
+    $items[] = $row;
+  }
+
+  return $items;
+}
+
+function runSafeQuery($query, $params) {
+  $connection = getConnection();
+  // PREPARE
+  $statement = $connection->prepare($query);
+  // check if prepare failed
+  if ($statement == false) {
+    die('Prepare failed: ' . $connection->error);
+  }
+  // BIND PARAMETERS
+  // ex SELECT * FROM dogs WHERE id = ? AND name = ?
+  // $statement->bind_param('is', 1, 'spot');
+  // s = string, i = int, b = blob/binary
+  if (count($params) > 0) {
+    $statement->bind_param(...$params);
+  }
+  if ($statement->error) {
+    die('Bind failed: ' . $statement->error);
+  }
+  $success = $statement->execute();
+  if ($success == false) {
+    die('Execute failed: ' . $statement->error);
+  }
+  $result = $statement->get_result();
+  $connection->close();
+
+  $results = [];
+
+  // var_dump($result);
+  // die("RESULT IS" . $result);
+
+  while ($result && $row = $result->fetch_array()) {
+    $results[] = $row;
+  }
+
+  return $results;
+}
+
+function removeExcerptById($id) {
+  runSafeQuery(
+    "DELETE FROM editor_picks WHERE id = ?",
+    ["i", $id]
+  );
+}
+
+function getCompletedStories() {
+  $stories = runSafeQuery(
+    "SELECT * FROM stories WHERE is_done = true",
+    []
+  );
+
+  foreach ($stories as &$story) {
+    $story['chapters'] = runSafeQuery(
+      "SELECT * FROM chapters WHERE story_id = " . $story['id'],
+      []
+    );
+  }
+
+  return $stories;
+}
 
 
 

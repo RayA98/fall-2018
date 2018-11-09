@@ -1,4 +1,12 @@
 <?php
+session_start();
+
+if (isset($_SESSION['loggedInUser'])) {
+  // do nothing
+} else {
+  header('Location: login.php');
+}
+
 // profile.php
 
 require('header.php');
@@ -9,7 +17,7 @@ require('db.php');
 $myStories = getMyStories();
  ?>
 
-<img id="profile-pic" src="https://free-wired.com/wp-content/uploads/2018/05/headshot-resume-awesome-the-national-resume-writers-association-certification-of-headshot-resume.jpg" alt="">
+<img id="profile-pic" src="<?php echo $_SESSION['loggedInUser']['img'] ?>" alt="">
 
 <section id="profile-content">
   <h2>Your Stories...</h2>

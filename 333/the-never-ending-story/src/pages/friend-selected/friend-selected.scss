@@ -1,0 +1,20 @@
+page-friend-selected {
+  display: block;
+  text-align: center;
+  img {
+    width: 300px;
+    height: 300px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 1000px;
+  }
+  #profile-button {
+    position: absolute;
+    bottom: 3%;
+    width: 80%;
+    left: 10%;
+  }
+
+}

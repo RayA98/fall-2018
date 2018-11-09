@@ -1,0 +1,45 @@
+<ion-content padding>
+
+<h1>Your Stories</h1>
+
+<ion-card>
+  <ion-card-header>
+    Things you're working on
+  </ion-card-header>
+
+  <ion-list>
+    <button *ngFor="let story of current" ion-item (click)="goToWrite()">
+      {{story.title}}
+    </button>
+  </ion-list>
+</ion-card>
+
+<ion-card>
+  <ion-card-header>
+    Things you started
+  </ion-card-header>
+
+  <ion-list>
+    <button *ngFor="let story of authored" ion-item (click)="goToWrite()">
+      {{story.title}}
+    </button>
+  </ion-list>
+</ion-card>
+
+<ion-card>
+  <ion-card-header>
+    Things you've worked on
+  </ion-card-header>
+
+  <ion-list>
+    <button *ngFor="let story of past" ion-item (click)="goToWrite()">
+      {{story.title}}
+    </button>
+  </ion-list>
+</ion-card>
+</ion-content>
+
+<ion-tabs>
+  <ion-tab [root]="profilePage">You</ion-tab>
+  <ion-tab [root]="explorePage">Read</ion-tab>
+</ion-tabs>

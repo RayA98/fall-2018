@@ -1,0 +1,11 @@
+<!-- Generated template for the StoryComponent component -->
+<div>
+  <section id="chapter-numbers" padding>
+    <a *ngFor="let chapter of chapters; let i = index" href="#ch{{i + 1}}">{{i + 1}}</a>
+  </section>
+  <section id="chapters">
+    <ion-card *ngFor="let chapter of chapters; let i = index" id="ch{{i + 1}}" padding>
+      {{chapter.text}}
+    </ion-card>
+  </section>
+</div>
